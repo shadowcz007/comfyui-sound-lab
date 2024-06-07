@@ -63,6 +63,12 @@ const createWaveSurfer = (wavesurfer, id) => {
     // And the bar radius
     barRadius: 6
   })
+
+  // 监听播放结束事件，重新开始播放以实现循环播放
+  wavesurfer.on('finish', function () {
+     wavesurfer.play()
+  })
+
   return wavesurfer
 }
 
@@ -90,14 +96,14 @@ app.registerExtension({
 
         // console.log('AudioPlay nodeData', this)
         widget.div = $el('div', {})
-       
+
         document.body.appendChild(widget.div)
 
         // wave
-        const waveDiv=document.createElement('div');
-        waveDiv.className='wave'
-        waveDiv.style.minHeight='200px'
-        widget.div.appendChild(waveDiv);
+        const waveDiv = document.createElement('div')
+        waveDiv.className = 'wave'
+        waveDiv.style.minHeight = '200px'
+        widget.div.appendChild(waveDiv)
 
         //play button
         const playBtn = document.createElement('button')
@@ -143,7 +149,7 @@ app.registerExtension({
           widget.value = url
 
           if (widget.div) {
-            widget.div.setAttribute('data-url', url) 
+            widget.div.setAttribute('data-url', url)
             widget.div.querySelector('.wave').id = `AudioPlay_${this.id}`
           }
           that.wavesurfer = createWaveSurfer(
@@ -151,6 +157,7 @@ app.registerExtension({
             `AudioPlay_${this.id}`
           )
           that.wavesurfer.load(url)
+          that.wavesurfer?.playPause()
         } catch (error) {
           console.log(error)
         }
