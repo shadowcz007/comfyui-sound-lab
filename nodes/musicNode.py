@@ -6,16 +6,24 @@ import torch
 from comfy.model_management import get_torch_device
 from huggingface_hub import snapshot_download
 
-# print('#######s',os.path.join(__file__,'../'))
+# 获取当前文件的绝对路径
+current_file_path = os.path.abspath(__file__)
 
-sys.path.append(os.path.join(__file__,'../../'))
-                
+# 获取当前文件的目录
+current_directory = os.path.dirname(current_file_path)
+
+# 添加当前插件的nodes路径，使ChatTTS可以被导入使用
+sys.path.append(current_directory)
+
+       
 from scipy.io import wavfile
 import torch
 from transformers import AutoProcessor, MusicgenForConditionalGeneration
 
+from .utils import get_new_counter
 
-modelpath=os.path.join(folder_paths.models_dir, "musicgen-small")
+
+modelpath=os.path.join(folder_paths.models_dir, "musicgen")
 
 
 def init_audio_model(checkpoint):
@@ -50,7 +58,7 @@ class MusicNode:
                          {
                             "multiline": True, 
                             "default": '',
-                            "dynamicPrompts": False
+                            "dynamicPrompts": True
                           }),
             "guidance_scale":("FLOAT", {
                         "default": 4.0, 
@@ -72,17 +80,17 @@ class MusicNode:
                 }
     
     RETURN_TYPES = ("AUDIO",)
+    RETURN_NAMES = ("audio",)
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Audio"
+    CATEGORY = "♾️Sound Lab"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
   
     def run(self,prompt,guidance_scale,max_tokens):
       
-    
         if self.audio_model ==None:
             
             if os.path.exists(modelpath)==False:
@@ -101,7 +109,6 @@ class MusicNode:
                 self.audio_processor,self.audio_model=init_audio_model(modelpath)
                 
           
-        
         inputs = self.audio_processor(
             text=prompt,
             # audio=audio,
@@ -128,15 +135,51 @@ class MusicNode:
 
         audio=audio_values[0, 0].cpu().numpy()
 
-        if not os.path.exists(folder_paths.get_temp_directory()):
-            os.mkdir(folder_paths.get_temp_directory())
-
-        fp=os.path.join(folder_paths.get_temp_directory(),'output_file.wav')
+        output_dir = folder_paths.get_output_directory()
+    
+        audio_file="music_gen"
+        counter=get_new_counter(output_dir,audio_file)
+        # print('#audio_path',folder_paths, )
+        # 添加文件名后缀
+        audio_file = f"{audio_file}_{counter:05}.wav"
+        
+        audio_path=os.path.join(output_dir, audio_file)
+ 
         # save the best audio sample (index 0) as a .wav file
-        wavfile.write(fp, rate=sampling_rate, data=audio)
+        wavfile.write(audio_path, rate=sampling_rate, data=audio)
 
-        with open(fp, "rb") as audio_file:
-            audio_data = audio_file.read()
-            audio_base64 = f'data:audio/wav;base64,'+base64.b64encode(audio_data).decode("utf-8")
+        # with open(audio_path, "rb") as audio_file:
+        #     audio_data = audio_file.read()
+        #     audio_base64 = f'data:audio/wav;base64,'+base64.b64encode(audio_data).decode("utf-8")
 
-        return {"ui": {"audio_base64": [audio_base64]}, "result": (audio_base64,)}
+        return ({
+                "filename": audio_file,
+                "subfolder": "",
+                "type": "output"
+                },)
+    
+
+
+class AudioPlayNode:
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "audio": ("AUDIO",),
+              }, 
+                }
+    
+    RETURN_TYPES = ()
+  
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Sound Lab"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = ()
+
+    OUTPUT_NODE = True
+  
+    def run(self,audio):
+        print(audio)
+        return {"ui": {"audio":[audio]}}
