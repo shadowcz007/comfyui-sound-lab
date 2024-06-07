@@ -1,0 +1,9 @@
+LICENSE
+README.rst
+ffmpy.py
+setup.cfg
+setup.py
+ffmpy.egg-info/PKG-INFO
+ffmpy.egg-info/SOURCES.txt
+ffmpy.egg-info/dependency_links.txt
+ffmpy.egg-info/top_level.txt

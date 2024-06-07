@@ -1,1 +1,12 @@
+einops==0.7.0
+einops-exts==0.0.4
+soundfile==0.10.2
+aeiou==0.0.20
 transformers>=4.36.2
+alias-free-torch==0.0.6
+ema-pytorch==0.2.3
+encodec==0.1.1
+x-transformers<1.27.0
+descript-audiotools
+descript-audio-codec==1.0.0
+k-diffusion
