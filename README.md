@@ -1,4 +1,4 @@
-
+![](./nodes.png)
 
 [musicgen-small](https://huggingface.co/facebook/musicgen-small) 放到文件夹 models/musicgen/：
 ![](./musicgen_model.png)
