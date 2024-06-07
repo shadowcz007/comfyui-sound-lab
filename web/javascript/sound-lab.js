@@ -66,7 +66,7 @@ const createWaveSurfer = (wavesurfer, id) => {
 
   // 监听播放结束事件，重新开始播放以实现循环播放
   wavesurfer.on('finish', function () {
-     wavesurfer.play()
+    wavesurfer.play()
   })
 
   return wavesurfer
@@ -124,6 +124,22 @@ app.registerExtension({
         })
         widget.div.appendChild(playBtn)
 
+        const urlLink = document.createElement('a')
+        urlLink.className = 'link'
+        urlLink.innerText = 'URL'
+        urlLink.setAttribute('target', '_blank')
+        urlLink.style=`    display: flex;
+        padding: 4px 15px;
+        color: white;
+        background-color: rgb(0, 123, 255);
+        text-decoration: none;
+        border-radius: 5px;
+        width: 32px;
+        transition: background-color 0.3s ease 0s;
+        margin: 8px;`
+        // urlLink.style.minHeight = '200px'
+        widget.div.appendChild(urlLink)
+
         this.addCustomWidget(widget)
 
         const onRemoved = this.onRemoved
@@ -151,6 +167,8 @@ app.registerExtension({
           if (widget.div) {
             widget.div.setAttribute('data-url', url)
             widget.div.querySelector('.wave').id = `AudioPlay_${this.id}`
+
+            widget.div.querySelector('.link').setAttribute('href', url)
           }
           that.wavesurfer = createWaveSurfer(
             that.wavesurfer,
@@ -173,6 +191,7 @@ app.registerExtension({
         if (widget.div) {
           widget.div.setAttribute('data-url', url)
           widget.div.querySelector('.wave').id = `AudioPlay_${node.id}`
+          widget.div.querySelector('.link').setAttribute('href', url)
         }
 
         this.wavesurfer = createWaveSurfer(

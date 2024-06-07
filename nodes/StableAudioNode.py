@@ -234,10 +234,10 @@ class StableAudioSampler:
                             "dynamicPrompts": True
                           }),
                 
-                "steps": ("INT", {"default": 100, "min": 1, "max": 10000}),
+                "steps": ("INT", {"default": 16, "min": 1, "max": 10000}),
                 "cfg_scale": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0, "step": 0.1}), 
                 "sigma_min": ("FLOAT", {"default": 0.3, "min": 0.0, "max": 1000.0, "step": 0.01}),
-                "sigma_max": ("FLOAT", {"default": 500.0, "min": 0.0, "max": 1000.0, "step": 0.01}),
+                "sigma_max": ("FLOAT", {"default": 200.0, "min": 0.0, "max": 1000.0, "step": 0.01}),
                 # "sampler_type": ("STRING", {"default": "dpmpp-3m-sde"}),
                 "seed":  ("INT", {"default": 0, "min": -1, "max": np.iinfo(np.int32).max}), 
                 "device":(["auto","cpu"],),
