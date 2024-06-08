@@ -1,17 +1,17 @@
 from .nodes.musicNode import MusicNode,AudioPlayNode
-from .nodes.StableAudioNode import StableAudioSampler
+from .nodes.StableAudioNode import StableAudioNode
 
 NODE_CLASS_MAPPINGS = {
-    "Musicgen": MusicNode,
+    "Musicgen_": MusicNode,
     "AudioPlay":AudioPlayNode,
-    "StableAudioSampler":StableAudioSampler
+    "StableAudio_":StableAudioNode
 }
 
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Musicgen": "Music Gen",
+    "Musicgen_": "Music Gen",
     "AudioPlay":"Audio Play",
-    "StableAudioSampler":"Stable Audio Sampler"
+    "StableAudio_":"Stable Audio"
 }
 
 # web ui的节点功能
