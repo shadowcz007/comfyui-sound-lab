@@ -190,11 +190,11 @@ def load_model(device):
     return model,sample_rate,sample_size
 
 
-def generate(model,prompt,seed,steps,cfg_scale,sample_size, sigma_min, sigma_max, sampler_type,device):
+def generate(model,prompt,seconds,seed,steps,cfg_scale,sample_size, sigma_min, sigma_max, sampler_type,device):
     conditioning = [{
         "prompt": prompt,
         "seconds_start": 0,
-        "seconds_total": 30
+        "seconds_total": seconds
     }]
     
     if seed==-1:
@@ -271,7 +271,7 @@ class StableAudioSampler:
         # 根据时长，计算size
         self.sample_size=int(self.sample_rate*seconds)
         
-        output=generate(self.initialized_model,prompt,seed,steps,cfg_scale,self.sample_size, sigma_min, sigma_max, "dpmpp-3m-sde",device)
+        output=generate(self.initialized_model,prompt,seconds,seed,steps,cfg_scale,self.sample_size, sigma_min, sigma_max, "dpmpp-3m-sde",device)
 
         self.initialized_model.to(torch.device('cpu'))
 
