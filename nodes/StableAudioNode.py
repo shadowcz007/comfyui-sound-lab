@@ -219,7 +219,7 @@ def generate(model,prompt,seconds,seed,steps,cfg_scale,sample_size, sigma_min, s
     return output
 
 
-class StableAudioSampler:
+class StableAudioNode:
     def __init__(self):
         self.initialized_model = None
         self.sample_rate=None
