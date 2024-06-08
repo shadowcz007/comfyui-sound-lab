@@ -105,40 +105,53 @@ app.registerExtension({
         waveDiv.style.minHeight = '200px'
         widget.div.appendChild(waveDiv)
 
+        // 按钮的区域
+        let btns = document.createElement('div')
+        btns.className = 'btns'
+        btns.style=`display: flex;
+        width: 100%;
+        justify-content: space-between;`;
+        widget.div.appendChild(btns)
+
         //play button
-        const playBtn = document.createElement('button')
+        const playBtn = document.createElement('a')
         playBtn.innerText = 'Play/Pause'
 
         playBtn.style = `
-          margin-top:2px;
-          background-color: var(--comfy-input-bg);
-          border-radius: 8px;
-          border-color: var(--border-color);
-          border-style: solid;
-          color: var(--descrip-text);
+        display: flex;
+        padding: 4px 15px;
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;
+        color: var(--descrip-text);
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease 0s;
           `
 
         playBtn.addEventListener('click', e => {
           e.preventDefault()
           that.wavesurfer?.playPause()
         })
-        widget.div.appendChild(playBtn)
+        btns.appendChild(playBtn)
 
         const urlLink = document.createElement('a')
         urlLink.className = 'link'
         urlLink.innerText = 'URL'
         urlLink.setAttribute('target', '_blank')
-        urlLink.style=`    display: flex;
+        urlLink.style = `display: flex;
         padding: 4px 15px;
-        color: white;
-        background-color: rgb(0, 123, 255);
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;
+        color: var(--descrip-text);
         text-decoration: none;
         border-radius: 5px;
-        width: 32px;
-        transition: background-color 0.3s ease 0s;
-        margin: 8px;`
+        transition: background-color 0.3s ease 0s;`
         // urlLink.style.minHeight = '200px'
-        widget.div.appendChild(urlLink)
+        btns.appendChild(urlLink)
 
         this.addCustomWidget(widget)
 
