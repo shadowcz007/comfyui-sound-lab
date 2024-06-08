@@ -155,7 +155,8 @@ class MusicNode:
         return ({
                 "filename": audio_file,
                 "subfolder": "",
-                "type": "output"
+                "type": "output",
+                "prompt":prompt
                 },)
     
 
@@ -181,5 +182,5 @@ class AudioPlayNode:
     OUTPUT_NODE = True
   
     def run(self,audio):
-        print(audio)
+        # print(audio)
         return {"ui": {"audio":[audio]}}

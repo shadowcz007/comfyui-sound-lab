@@ -39,12 +39,15 @@ function get_position_style (ctx, widget_width, y, node_height) {
 
 //把文件转为url访问
 const parseUrl = data => {
-  let { filename, subfolder, type } = data
-  return api.apiURL(
-    `/view?filename=${encodeURIComponent(
-      filename
-    )}&type=${type}&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
-  )
+  let { filename, subfolder, type, prompt } = data
+  return {
+    url: api.apiURL(
+      `/view?filename=${encodeURIComponent(
+        filename
+      )}&type=${type}&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
+    ),
+    prompt
+  }
 }
 
 const createWaveSurfer = (wavesurfer, id) => {
@@ -69,6 +72,23 @@ const createWaveSurfer = (wavesurfer, id) => {
     wavesurfer.play()
   })
 
+  return wavesurfer
+}
+
+//更新gui
+function updateWaveWidgetValue (widgets, id, url, prompt, wavesurfer) {
+  let widget = widgets.filter(w => w.name == 'AudioPlay')[0]
+  // 手动更新widget值
+  widget.value = [url, prompt]
+
+  if (widget.div) {
+    widget.div.setAttribute('data-url', url)
+    widget.div.querySelector('.wave').id = `AudioPlay_${id}`
+    widget.div.querySelector('.link').setAttribute('href', url)
+    widget.div.querySelector('.info').innerHTML = prompt
+  }
+  wavesurfer = createWaveSurfer(wavesurfer, `AudioPlay_${id}`)
+  wavesurfer.load(url)
   return wavesurfer
 }
 
@@ -105,12 +125,18 @@ app.registerExtension({
         waveDiv.style.minHeight = '200px'
         widget.div.appendChild(waveDiv)
 
+        //prompt 相关信息展示
+        const infoDiv = document.createElement('div')
+        infoDiv.className = 'info'
+        // infoDiv.style.minHeight = '200px'
+        widget.div.appendChild(infoDiv)
+
         // 按钮的区域
         let btns = document.createElement('div')
         btns.className = 'btns'
-        btns.style=`display: flex;
+        btns.style = `display: flex;
         width: 100%;
-        justify-content: space-between;`;
+        justify-content: space-between;`
         widget.div.appendChild(btns)
 
         //play button
@@ -132,6 +158,7 @@ app.registerExtension({
 
         playBtn.addEventListener('click', e => {
           e.preventDefault()
+          console.log('click', that.wavesurfer)
           that.wavesurfer?.playPause()
         })
         btns.appendChild(playBtn)
@@ -171,23 +198,16 @@ app.registerExtension({
         console.log('#onExecuted', `AudioPlay_${this.id}`, message)
         const audio = message.audio
         try {
-          let url = parseUrl(audio[0])
+          let { url, prompt } = parseUrl(audio[0])
 
-          let widget = this.widgets.filter(w => w.name == 'AudioPlay')[0]
-          // 手动更新widget值
-          widget.value = url
-
-          if (widget.div) {
-            widget.div.setAttribute('data-url', url)
-            widget.div.querySelector('.wave').id = `AudioPlay_${this.id}`
-
-            widget.div.querySelector('.link').setAttribute('href', url)
-          }
-          that.wavesurfer = createWaveSurfer(
-            that.wavesurfer,
-            `AudioPlay_${this.id}`
+          that.wavesurfer = updateWaveWidgetValue(
+            this.widgets,
+            this.id,
+            url,
+            prompt,
+            that.wavesurfer
           )
-          that.wavesurfer.load(url)
+
           that.wavesurfer?.playPause()
         } catch (error) {
           console.log(error)
@@ -200,18 +220,15 @@ app.registerExtension({
       let widget = node.widgets.filter(w => w.name == 'AudioPlay')[0]
 
       if (widget.value) {
-        let url = widget.value
-        if (widget.div) {
-          widget.div.setAttribute('data-url', url)
-          widget.div.querySelector('.wave').id = `AudioPlay_${node.id}`
-          widget.div.querySelector('.link').setAttribute('href', url)
-        }
+        let [url, prompt] = widget.value
 
-        this.wavesurfer = createWaveSurfer(
-          this.wavesurfer,
-          `AudioPlay_${node.id}`
+        this.wavesurfer = updateWaveWidgetValue(
+          node.widgets,
+          node.id,
+          url,
+          prompt,
+          this.wavesurfer
         )
-        this.wavesurfer.load(url)
       }
 
       console.log('#loadedGraphNode', node)

@@ -290,6 +290,7 @@ class StableAudioSampler:
         return ({
                 "filename": audio_file,
                 "subfolder": "",
-                "type": "output"
+                "type": "output",
+                "prompt":prompt
                 },)
     
