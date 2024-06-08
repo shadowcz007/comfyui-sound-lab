@@ -204,3 +204,29 @@ class AudioPlayNode:
     def run(self,audio):
         # print(audio)
         return {"ui": {"audio":[audio]}}
+    
+
+#todo
+# class LoadAudioNode:
+
+#     @classmethod
+#     def INPUT_TYPES(s):
+#         return {"required": {
+#                     "audio": ("AUDIO",),
+#               }, 
+#                 }
+    
+#     RETURN_TYPES = ()
+  
+#     FUNCTION = "run"
+
+#     CATEGORY = "♾️Sound Lab"
+
+#     INPUT_IS_LIST = False
+#     OUTPUT_IS_LIST = ()
+
+#     OUTPUT_NODE = True
+  
+#     def run(self,audio):
+#         # print(audio)
+#         return {"ui": {"audio":[audio]}}
