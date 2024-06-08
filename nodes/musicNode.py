@@ -60,20 +60,21 @@ class MusicNode:
                             "default": '',
                             "dynamicPrompts": True
                           }),
+            
+            "seconds":("FLOAT", {
+                        "default": 5, 
+                        "min": 1, #Minimum value
+                        "max": 1000, #Maximum value
+                        "step": 0.1, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    }),
             "guidance_scale":("FLOAT", {
                         "default": 4.0, 
                         "min": 0, #Minimum value
                         "max": 20, #Maximum value
                     }),
 
-            "max_tokens":("INT", {
-                        "default": 256, 
-                        "min": 0, #Minimum value
-                        "max": 2048, #Maximum value
-                        "step": 1, #Slider's step
-                        "display": "number" # Cosmetic only: display as "number" or "slider"
-                    }),
-            # "device": (["cpu","cuda"],),
+            "device": (["auto","cpu"],),
                              },
 
             
@@ -89,7 +90,7 @@ class MusicNode:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
   
-    def run(self,prompt,guidance_scale,max_tokens):
+    def run(self,prompt,seconds,guidance_scale,device):
       
         if self.audio_model ==None:
             
@@ -117,15 +118,23 @@ class MusicNode:
             return_tensors="pt",
         )
 
-        self.audio_model.to(torch.device('cuda'))
+        if device=='auto':
+            device="cuda" if torch.cuda.is_available() else "cpu"
+
+        self.audio_model.to(torch.device(device))
 
         # max_tokens=256 #default=5, le=30
         # if duration:
         #     max_tokens=int(duration*50)
-      
+
+        # seconds = 10  # 例如，用户输入的秒数
+        tokens_per_second = 1500 / 30
+        max_tokens = int(tokens_per_second * seconds)
+
+
         sampling_rate = self.audio_model.config.audio_encoder.sampling_rate
         # input_audio
-        audio_values = self.audio_model.generate(**inputs.to('cuda'), 
+        audio_values = self.audio_model.generate(**inputs.to(device), 
                     do_sample=True, 
                     guidance_scale=guidance_scale, 
                     max_new_tokens=max_tokens,

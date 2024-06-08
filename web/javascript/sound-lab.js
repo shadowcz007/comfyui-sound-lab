@@ -79,15 +79,28 @@ const createWaveSurfer = (wavesurfer, id) => {
 function updateWaveWidgetValue (widgets, id, url, prompt, wavesurfer) {
   let widget = widgets.filter(w => w.name == 'AudioPlay')[0]
   // 手动更新widget值
-  widget.value = [url, prompt]
+  widget.value = [url, prompt];
 
-  if (widget.div) {
-    widget.div.setAttribute('data-url', url)
-    widget.div.querySelector('.wave').id = `AudioPlay_${id}`
-    widget.div.querySelector('.link').setAttribute('href', url)
-    widget.div.querySelector('.info').innerHTML = prompt
+  if (widget.div) { 
+    widget.div.querySelector('.wave').id = `AudioPlay_${id}` 
   }
+
   wavesurfer = createWaveSurfer(wavesurfer, `AudioPlay_${id}`)
+
+  wavesurfer.on('ready', (duration) => { 
+    console.log('Audio duration: ' + duration + ' seconds')
+
+    if (widget.div) {
+      widget.div.setAttribute('data-url', url) 
+      widget.div.querySelector('.link').setAttribute('href', url)
+      widget.div.querySelector(
+        '.info'
+      ).innerHTML = `<span style="font-size: 12px;
+      margin: 8px;">${duration.toFixed(2)} seconds</span> <br><span style="font-size: 14px;">${prompt}</span> <br>`
+    }
+  })
+
+  
   wavesurfer.load(url)
   return wavesurfer
 }
@@ -122,13 +135,13 @@ app.registerExtension({
         // wave
         const waveDiv = document.createElement('div')
         waveDiv.className = 'wave'
-        waveDiv.style.minHeight = '200px'
+        waveDiv.style.minHeight = '172px'
         widget.div.appendChild(waveDiv)
 
         //prompt 相关信息展示
         const infoDiv = document.createElement('div')
         infoDiv.className = 'info'
-        // infoDiv.style.minHeight = '200px'
+        infoDiv.style.marginBottom = '20px'
         widget.div.appendChild(infoDiv)
 
         // 按钮的区域
@@ -158,8 +171,8 @@ app.registerExtension({
 
         playBtn.addEventListener('click', e => {
           e.preventDefault()
-          console.log('click', that.wavesurfer)
-          that.wavesurfer?.playPause()
+          console.log('click', that[`wavesurfer_${this.id}`])
+          that[`wavesurfer_${this.id}`]?.playPause()
         })
         btns.appendChild(playBtn)
 
@@ -200,15 +213,15 @@ app.registerExtension({
         try {
           let { url, prompt } = parseUrl(audio[0])
 
-          that.wavesurfer = updateWaveWidgetValue(
+          that[`wavesurfer_${this.id}`] = updateWaveWidgetValue(
             this.widgets,
             this.id,
             url,
             prompt,
-            that.wavesurfer
+            that[`wavesurfer_${this.id}`]
           )
 
-          that.wavesurfer?.playPause()
+          that[`wavesurfer_${this.id}`]?.playPause()
         } catch (error) {
           console.log(error)
         }
@@ -222,12 +235,12 @@ app.registerExtension({
       if (widget.value) {
         let [url, prompt] = widget.value
 
-        this.wavesurfer = updateWaveWidgetValue(
+        this[`wavesurfer_${node.id}`] = updateWaveWidgetValue(
           node.widgets,
           node.id,
           url,
           prompt,
-          this.wavesurfer
+          this[`wavesurfer_${node.id}`] 
         )
       }
 
