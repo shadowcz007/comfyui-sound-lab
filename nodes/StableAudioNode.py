@@ -27,11 +27,13 @@ from .utils import get_new_counter
 
 os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
 
+# sample_size/sample_rate = 47s
+
 def get_model_config():
     return {
         "model_type": "diffusion_cond",
         "sample_size": 2097152,
-        "sample_rate": 44100,
+        "sample_rate": 44100, 
         "audio_channels": 2,
         "model": {
             "pretransform": {
@@ -233,13 +235,16 @@ class StableAudioSampler:
                             "default": '128 BPM tech house drum loop',
                             "dynamicPrompts": True
                           }),
-                
+                "seconds":("FLOAT", {"default": 47, "min": 1, "max": 10000,"step": 0.1}),
                 "steps": ("INT", {"default": 16, "min": 1, "max": 10000}),
+
+                "seed":  ("INT", {"default": 0, "min": 0, "max": np.iinfo(np.int32).max}), 
+
                 "cfg_scale": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0, "step": 0.1}), 
                 "sigma_min": ("FLOAT", {"default": 0.3, "min": 0.0, "max": 1000.0, "step": 0.01}),
                 "sigma_max": ("FLOAT", {"default": 200.0, "min": 0.0, "max": 1000.0, "step": 0.01}),
                 # "sampler_type": ("STRING", {"default": "dpmpp-3m-sde"}),
-                "seed":  ("INT", {"default": 0, "min": 0, "max": np.iinfo(np.int32).max}), 
+                
                 "device":(["auto","cpu"],),
             }
         }
@@ -253,7 +258,7 @@ class StableAudioSampler:
 
     CATEGORY = "♾️Sound Lab"
 
-    def run(self, prompt,steps, cfg_scale,  sigma_min, sigma_max, seed, device):
+    def run(self, prompt,seconds,steps,seed, cfg_scale,  sigma_min, sigma_max, device):
 
         if device=='auto':
             device="cuda" if torch.cuda.is_available() else "cpu"
@@ -263,6 +268,9 @@ class StableAudioSampler:
         else:
             self.initialized_model,self.sample_rate,self.sample_size=load_model(device)
 
+        # 根据时长，计算size
+        self.sample_size=int(self.sample_rate*seconds)
+        
         output=generate(self.initialized_model,prompt,seed,steps,cfg_scale,self.sample_size, sigma_min, sigma_max, "dpmpp-3m-sde",device)
 
         self.initialized_model.to(torch.device('cpu'))
