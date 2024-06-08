@@ -2,7 +2,7 @@ import os,sys,base64
 import folder_paths
 import numpy as np
 
-import torch
+import torch,random
 from comfy.model_management import get_torch_device
 from huggingface_hub import snapshot_download
 
@@ -74,6 +74,8 @@ class MusicNode:
                         "max": 20, #Maximum value
                     }),
 
+            "seed":  ("INT", {"default": 0, "min": 0, "max": np.iinfo(np.int32).max}), 
+
             "device": (["auto","cpu"],),
                              },
 
@@ -90,7 +92,16 @@ class MusicNode:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
   
-    def run(self,prompt,seconds,guidance_scale,device):
+    def run(self,prompt,seconds,guidance_scale,seed,device):
+        
+        if seed==-1:
+            seed = np.random.randint(0, np.iinfo(np.int32).max)
+
+        # Set the seed for reproducibility
+        torch.manual_seed(seed)
+        random.seed(seed)
+        np.random.seed(seed)
+
       
         if self.audio_model ==None:
             
