@@ -1,3 +1,4 @@
+torchaudio
 einops==0.7.0
 einops-exts==0.0.4
 soundfile==0.10.2
