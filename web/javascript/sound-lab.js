@@ -67,16 +67,43 @@ const createWaveSurfer = (wavesurfer, id) => {
     barRadius: 6
   })
 
-  wavesurfer._auto=true
+  wavesurfer._auto = true
 
   // 监听播放结束事件，重新开始播放以实现循环播放
   wavesurfer.on('finish', function () {
-    if(wavesurfer._auto) wavesurfer.play()
+    if (wavesurfer._auto) wavesurfer.play()
   })
 
   wavesurfer.on('interaction', () => {
-    wavesurfer._auto=false
+    wavesurfer._auto = false
     if (!wavesurfer.isPlaying()) wavesurfer.play()
+  })
+
+  // 获取当前播放时间的峰值
+  wavesurfer.on('audioprocess', () => {
+    if (wavesurfer.isPlaying()) {
+      const channelData = wavesurfer.getDecodedData().getChannelData(0); 
+      const currentTime = wavesurfer.getCurrentTime()
+      // console.log(wavesurfer)
+      const sampleRate = wavesurfer.getDecodedData().sampleRate
+
+      // 定义要分析的时间窗口（例如1秒）
+      const windowSize = 1
+      const startSample = Math.floor(currentTime * sampleRate)
+      const endSample = Math.min(
+        startSample + windowSize * sampleRate,
+        channelData.length
+      )
+
+      let peak = 0
+      for (let i = startSample; i < endSample; i++) {
+        const value = Math.abs(channelData[i])
+        if (value > peak) {
+          peak = value
+        }
+      }
+      // console.log('Current Peak:', peak)
+    }
   })
 
   return wavesurfer
@@ -86,28 +113,29 @@ const createWaveSurfer = (wavesurfer, id) => {
 function updateWaveWidgetValue (widgets, id, url, prompt, wavesurfer) {
   let widget = widgets.filter(w => w.name == 'AudioPlay')[0]
   // 手动更新widget值
-  widget.value = [url, prompt];
+  widget.value = [url, prompt]
 
-  if (widget.div) { 
-    widget.div.querySelector('.wave').id = `AudioPlay_${id}` 
+  if (widget.div) {
+    widget.div.querySelector('.wave').id = `AudioPlay_${id}`
   }
 
   wavesurfer = createWaveSurfer(wavesurfer, `AudioPlay_${id}`)
 
-  wavesurfer.on('ready', (duration) => { 
+  wavesurfer.on('ready', duration => {
     console.log('Audio duration: ' + duration + ' seconds')
 
     if (widget.div) {
-      widget.div.setAttribute('data-url', url) 
+      widget.div.setAttribute('data-url', url)
       widget.div.querySelector('.link').setAttribute('href', url)
       widget.div.querySelector(
         '.info'
       ).innerHTML = `<span style="font-size: 12px;
-      margin: 8px;">${duration.toFixed(2)} seconds</span> <br><span style="font-size: 14px;">${prompt}</span> <br>`
+      margin: 8px;">${duration.toFixed(
+        2
+      )} seconds</span> <br><span style="font-size: 14px;">${prompt}</span> <br>`
     }
   })
 
-  
   wavesurfer.load(url)
   return wavesurfer
 }
@@ -178,11 +206,10 @@ app.registerExtension({
 
         playBtn.addEventListener('click', e => {
           e.preventDefault()
-          if(that[`wavesurfer_${this.id}`]){
+          if (that[`wavesurfer_${this.id}`]) {
             that[`wavesurfer_${this.id}`]?.playPause()
-            that[`wavesurfer_${this.id}`]._auto=true;
+            that[`wavesurfer_${this.id}`]._auto = true
           }
-         
         })
         btns.appendChild(playBtn)
 
@@ -250,7 +277,7 @@ app.registerExtension({
           node.id,
           url,
           prompt,
-          this[`wavesurfer_${node.id}`] 
+          this[`wavesurfer_${node.id}`]
         )
       }
 
