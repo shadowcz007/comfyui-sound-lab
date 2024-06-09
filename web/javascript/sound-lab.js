@@ -67,9 +67,16 @@ const createWaveSurfer = (wavesurfer, id) => {
     barRadius: 6
   })
 
+  wavesurfer._auto=true
+
   // 监听播放结束事件，重新开始播放以实现循环播放
   wavesurfer.on('finish', function () {
-    wavesurfer.play()
+    if(wavesurfer._auto) wavesurfer.play()
+  })
+
+  wavesurfer.on('interaction', () => {
+    wavesurfer._auto=false
+    if (!wavesurfer.isPlaying()) wavesurfer.play()
   })
 
   return wavesurfer
@@ -171,8 +178,11 @@ app.registerExtension({
 
         playBtn.addEventListener('click', e => {
           e.preventDefault()
-          console.log('click', that[`wavesurfer_${this.id}`])
-          that[`wavesurfer_${this.id}`]?.playPause()
+          if(that[`wavesurfer_${this.id}`]){
+            that[`wavesurfer_${this.id}`]?.playPause()
+            that[`wavesurfer_${this.id}`]._auto=true;
+          }
+         
         })
         btns.appendChild(playBtn)
 
