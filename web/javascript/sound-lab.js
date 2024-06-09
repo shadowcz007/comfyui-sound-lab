@@ -71,6 +71,7 @@ const createWaveSurfer = (wavesurfer, id) => {
 
   // 监听播放结束事件，重新开始播放以实现循环播放
   wavesurfer.on('finish', function () {
+    // console.log(wavesurfer)
     if (wavesurfer._auto) wavesurfer.play()
   })
 
@@ -229,6 +230,11 @@ app.registerExtension({
         transition: background-color 0.3s ease 0s;`
         // urlLink.style.minHeight = '200px'
         btns.appendChild(urlLink)
+
+
+        //todo 导出视频 that[`wavesurfer_${this.id}`].renderer.exportImage('image/png',1,'dataURL')
+        // https://github.com/diffusion-studio/ffmpeg-js
+
 
         this.addCustomWidget(widget)
 
