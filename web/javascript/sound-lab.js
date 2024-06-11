@@ -50,7 +50,7 @@ const parseUrl = data => {
   }
 }
 
-const createWaveSurfer = (wavesurfer, id) => {
+const createWaveSurfer = (wavesurfer, id,url) => {
   // Create an instance of WaveSurfer
   if (wavesurfer) {
     wavesurfer.destroy()
@@ -64,7 +64,8 @@ const createWaveSurfer = (wavesurfer, id) => {
     // Optionally, specify the spacing between bars
     barGap: 2,
     // And the bar radius
-    barRadius: 6
+    barRadius: 6,
+    url
   })
 
   wavesurfer._auto = true
@@ -82,7 +83,7 @@ const createWaveSurfer = (wavesurfer, id) => {
 
   // 获取当前播放时间的峰值
   wavesurfer.on('audioprocess', () => {
-    if (wavesurfer.isPlaying()) {
+    if (wavesurfer.isPlaying()&&wavesurfer.getDecodedData()) {
       const channelData = wavesurfer.getDecodedData().getChannelData(0); 
       const currentTime = wavesurfer.getCurrentTime()
       // console.log(wavesurfer)
@@ -120,11 +121,10 @@ function updateWaveWidgetValue (widgets, id, url, prompt, wavesurfer) {
     widget.div.querySelector('.wave').id = `AudioPlay_${id}`
   }
 
-  wavesurfer = createWaveSurfer(wavesurfer, `AudioPlay_${id}`)
+  wavesurfer = createWaveSurfer(wavesurfer, `AudioPlay_${id}`,url)
 
   wavesurfer.on('ready', duration => {
     console.log('Audio duration: ' + duration + ' seconds')
-
     if (widget.div) {
       widget.div.setAttribute('data-url', url)
       widget.div.querySelector('.link').setAttribute('href', url)
@@ -133,11 +133,13 @@ function updateWaveWidgetValue (widgets, id, url, prompt, wavesurfer) {
       ).innerHTML = `<span style="font-size: 12px;
       margin: 8px;">${duration.toFixed(
         2
-      )} seconds</span> <br><span style="font-size: 14px;">${prompt}</span> <br>`
+      )} seconds</span> <br><span style="font-size: 14px;">${prompt||''}</span> <br>`
     }
   })
-
+  
+  
   wavesurfer.load(url)
+  // console.log('updateWaveWidgetValue' ,url,wavesurfer)
   return wavesurfer
 }
 
@@ -251,8 +253,8 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
-        console.log('#onExecuted', `AudioPlay_${this.id}`, message)
         const audio = message.audio
+        console.log('#onExecuted', `AudioPlay_${this.id}`, message,audio)
         try {
           let { url, prompt } = parseUrl(audio[0])
 
