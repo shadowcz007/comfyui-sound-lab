@@ -10,7 +10,7 @@ NODE_CLASS_MAPPINGS = {
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Musicgen_": "Music Gen",
-    "AudioPlay":"Audio Play",
+    "AudioPlay":"Audio Play ♾️Mixlab",
     "StableAudio_":"Stable Audio"
 }
 
