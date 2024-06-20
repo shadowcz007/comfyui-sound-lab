@@ -1,4 +1,5 @@
 
+> [寻求帮助 Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
 
 
