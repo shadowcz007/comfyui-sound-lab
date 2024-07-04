@@ -30,3 +30,22 @@ torch 2.2.2+cu121
 到comfyui-sound-lab 目录下，然后双击 ```install.bat``` ，适配window的安装包
 
 如果安装失败，可以查看下报错信息，欢迎反馈
+
+####
+使用了 audiotools ，需要 "protobuf >= 3.9.2, < 3.20" ；
+onnx 需要 protobuf-5.27.2
+
+
+### 相关插件推荐
+
+[comfyui-liveportrait](https://github.com/shadowcz007/comfyui-liveportrait)
+
+[Comfyui-ChatTTS](https://github.com/shadowcz007/Comfyui-ChatTTS)
+
+[comfyui-sound-lab](https://github.com/shadowcz007/comfyui-sound-lab)
+
+[comfyui-Image-reward](https://github.com/shadowcz007/comfyui-Image-reward)
+
+[comfyui-ultralytics-yolo](https://github.com/shadowcz007/comfyui-ultralytics-yolo)
+
+[comfyui-moondream](https://github.com/shadowcz007/comfyui-moondream)
